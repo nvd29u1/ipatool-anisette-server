@@ -1,0 +1,76 @@
+name: Build Anisette Server
+
+# Builds NVD-Anisette-Server.exe (Windows amd64) from cmd/anisette-server.
+# The exe is a single file; it does NOT bundle Apple's binaries — the engine
+# downloads ~11 GB of Apple restore data from Apple's CDN on first run.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "cmd/anisette-server/**"
+      - ".github/workflows/build-anisette-server.yml"
+      - "go.mod"
+      - "go.sum"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "cmd/anisette-server/**"
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build NVD-Anisette-Server
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.5"
+          cache: true
+
+      - name: Vet
+        run: go vet ./cmd/anisette-server/
+
+      - name: Build Windows amd64 exe
+        run: go build -trimpath -ldflags "-s -w" -o NVD-Anisette-Server.exe ./cmd/anisette-server
+        env:
+          GOOS: windows
+          GOARCH: amd64
+          CGO_ENABLED: "0"
+
+      - name: Build Linux amd64 binary (for Docker / smoke check)
+        run: go build -trimpath -ldflags "-s -w" -o anisette-server-linux-amd64 ./cmd/anisette-server
+        env:
+          GOOS: linux
+          GOARCH: amd64
+          CGO_ENABLED: "0"
+
+      - name: Upload Windows exe artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NVD-Anisette-Server-windows-amd64
+          path: NVD-Anisette-Server.exe
+          if-no-files-found: error
+
+      - name: Upload Linux binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: anisette-server-linux-amd64
+          path: anisette-server-linux-amd64
+          if-no-files-found: error
+
+      - name: Attach exe to GitHub Release (releases only)
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            NVD-Anisette-Server.exe
+            anisette-server-linux-amd64
