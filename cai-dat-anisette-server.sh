@@ -19,7 +19,7 @@ ARCH="$(uname -m)"
 case "$ARCH" in
   x86_64|amd64)
     BIN_NAME="anisette-server-linux-amd64"
-    BIN_SHA256="6f568117e030a7be739947e8a4e4eb35419bab90678e211937ac2af317aa497e"
+    BIN_SHA256="763b992d8df33fc387482b38932750e53f0a8a5d57f6eb37416a6a0eb85cad38"
     BIN_SIZE=16969993
     ;;
   aarch64|arm64)
@@ -29,7 +29,7 @@ case "$ARCH" in
     # Chưa kiểm chứng chạy thật trên máy ARM — nếu provisioning báo lỗi,
     # ghi lại log, đừng xóa adi.json vội.
     BIN_NAME="anisette-server-linux-arm64"
-    BIN_SHA256="39aad0288b36bb7d43bd55d2cb9dfcb9ad6a7795d5ae626be1d2fee5a15a4da6"
+    BIN_SHA256="508cfe057b55d68e663b3bba958b97dcd921e4d35e856f4777bc0e8702897766"
     BIN_SIZE=16253193
     ;;
   *)
