@@ -53,6 +53,13 @@ jobs:
           GOARCH: amd64
           CGO_ENABLED: "0"
 
+      - name: Build Linux arm64 binary (for Oracle Ampere A1 / ARM VPS)
+        run: go build -trimpath -ldflags "-s -w" -o anisette-server-linux-arm64 ./cmd/anisette-server
+        env:
+          GOOS: linux
+          GOARCH: arm64
+          CGO_ENABLED: "0"
+
       - name: Upload Windows exe artifact
         uses: actions/upload-artifact@v4
         with:
@@ -67,6 +74,13 @@ jobs:
           path: anisette-server-linux-amd64
           if-no-files-found: error
 
+      - name: Upload Linux arm64 binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: anisette-server-linux-arm64
+          path: anisette-server-linux-arm64
+          if-no-files-found: error
+
       - name: Attach exe to GitHub Release (releases only)
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
@@ -74,3 +88,4 @@ jobs:
           files: |
             NVD-Anisette-Server.exe
             anisette-server-linux-amd64
+            anisette-server-linux-arm64
